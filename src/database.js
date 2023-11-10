@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 
 //ENV PROD
-mongoose.connect('mongodb://database/powerpulsesports_db')
+mongoose.connect('mongodb://database/mydatabase')
 
 //ENV DEV
 //mongoose.connect("mongodb://localhost:27017/mydb")
