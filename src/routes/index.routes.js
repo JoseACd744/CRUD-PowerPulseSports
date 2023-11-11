@@ -140,7 +140,7 @@ router.delete('/users/:userId/products/:productId/comments/:id', async(req, res)
 router.post('/users/:userId/orders', async(req, res) => {
     const body = req.body;
     body.user = req.params.userId; // Asignamos el userId al cuerpo de la orden
-    const respuesta = await ModelOrder.create(body);
+    const respuesta = await OrderModel.create(body);
     res.send(respuesta);
 });
 
