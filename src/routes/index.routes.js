@@ -203,7 +203,7 @@ router.delete('/users/:userId/products/:productId/orders/:id', async(req, res) =
 // CREATE CART FOR A USER
 router.post('/users/:userId/carts', async(req, res) => {
     const body = req.body;
-    body.userId = req.params.userId; // Asignamos el userId al cuerpo del carrito
+    body.user = req.params.userId; // Asignamos el userId al campo user del carrito
     const respuesta = await CartModel.create(body);
     res.send(respuesta);
 });
