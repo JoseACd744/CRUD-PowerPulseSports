@@ -1,15 +1,28 @@
 const express = require('express');
 const app = express();
 
+const session = require('express-session');
+//Para poder usar el metodo PUT y DELETE
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
+
 require('./database');
 // Motor de Plantillas: EJS
 app.set("view engine", "ejs")
 app.set("views", __dirname + "/views");
 
+//uso formato json
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static("./src/public"))
+
+// Prueba de inicio sesion:
+app.use(session({
+    secret: 'tu secreto aquí',
+    resave: false,
+    saveUninitialized: false,
+}));
 
 
 
