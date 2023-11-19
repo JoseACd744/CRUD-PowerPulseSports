@@ -18,13 +18,17 @@ const upload = multer({ storage: storage });
 
 router.get('/products', ProductController.readProducts);
 router.get('/products/new', ProductController.renderNewProductForm);
-router.get('/products/:id/edit', ProductController.renderEditProductForm);
 
 router.post('/products', upload.single('image'), ProductController.createProduct);
 //router.post('/products', ProductController.createProduct);
-router.get('/products', ProductController.readProducts);
-router.put('/products/:id', ProductController.updateProduct);
-router.delete('/products/:id', ProductController.deleteProduct);
+router.get('/products/:id/edit', ProductController.renderEditProductForm);
 
+// Ruta para manejar la actualización del producto
+router.post('/products/:id/edit', ProductController.updateProduct);
+
+// Ruta para manejar la eliminación de un producto
+router.post('/products/:id/delete', ProductController.deleteProduct);
+        
+router.post('/products/:id/rate', ProductController.rateProduct);
 
 module.exports = router;

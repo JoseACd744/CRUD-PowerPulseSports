@@ -1,27 +1,34 @@
 const RatingModel = require('../models/RatingModel');
+const ProductModel = require('../models/ProductModel');
 
 exports.createRatingForProductByUser = async (req, res) => {
-    const body = req.body;
-    body.productId = req.params.productId;
-    body.userId = req.params.userId;
-    const respuesta = await RatingModel.create(body);
-    res.send(respuesta);
+    const { userId, productId } = req.params;
+    const { rating } = req.body;
+
+    // Verificar si el usuario ya ha calificado el producto
+    const existingRating = await RatingModel.findOne({ user: userId, product: productId });
+
+    if (existingRating) {
+        // Si el usuario ya ha calificado el producto, puedes manejar esto según tus requisitos.
+        // En este ejemplo, devolvemos un mensaje indicando que el usuario ya ha calificado el producto.
+        return res.status(400).send('El usuario ya ha calificado este producto.');
+    }
+
+    // Crear una nueva calificación
+    const newRating = await RatingModel.create({ user: userId, product: productId, rating });
+
+    // Actualizar el promedio de calificación del producto
+    await updateProductAverageRating(productId);
+
+    res.send(newRating);
 };
 
-exports.readRatingsForProductByUser = async (req, res) => {
-    const respuesta = await RatingModel.find({ productId: req.params.productId, userId: req.params.userId });
-    res.send(respuesta);
-};
+async function updateProductAverageRating(productId) {
+    const ratings = await RatingModel.find({ product: productId });
+    const totalRating = ratings.reduce((sum, rating) => sum + rating.rating, 0);
+    const averageRating = totalRating / ratings.length;
 
-exports.updateRatingForProductByUser = async (req, res) => {
-    const id = req.params.id;
-    const body = req.body;
-    const respuesta = await RatingModel.findByIdAndUpdate(id, body);
-    res.send(respuesta);
-};
+    await ProductModel.findByIdAndUpdate(productId, { averageRating });
+}
 
-exports.deleteRatingForProductByUser = async (req, res) => {
-    const id = req.params.id;
-    const respuesta = await RatingModel.findByIdAndDelete(id);
-    res.send(respuesta);
-};
+// Resto del controlador...

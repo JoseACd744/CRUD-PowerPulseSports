@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <title>Productos</title>
 </head>
 <body>
@@ -76,47 +76,100 @@
                             <h2 class="card-title"><%= product.name %></h2>
                             <p class="card-text"><%= product.description %></p>
                             <p class="card-text">Precio: <%= product.price %></p>
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="col-md-6">
-                    <h3>Comentarios</h3>
-                    <% for(let comment of product.comments) { %>
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <div class="form-floating flex-grow-1">
-                                <p class="form-control" id="commentText<%= comment._id %>"><%= comment.text %></p>
-                                <label for="commentText<%= comment._id %>">Por: <%= comment.userId ? comment.userId.name : 'Usuario desconocido' %></label>
-                            </div>
-                            <% if (user && comment.userId && user._id.toString() === comment.userId._id.toString()) { %>
-                                <div>
-                                    <form action="/comments/<%= comment._id %>/delete" method="POST" style="display: inline;">
-                                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                                    </form>
-                                    <form action="/comments/<%= comment._id %>/edit" method="GET" style="display: inline;">
-                                        <button type="submit" class="btn btn-warning ms-2">Editar</button>
-                                    </form>
-                                </div>
+                            <h4>Calificación Promedio:</h4>
+                            <% 
+                                let fullStars = Math.floor(product.averageRating);
+                                let halfStar = product.averageRating % 1 !== 0;
+                                let emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+                            %>
+                            <% for(let i = 0; i < fullStars; i++) { %>
+                                <i class="fas fa-star"></i>
                             <% } %>
+                            <% if(halfStar) { %>
+                                <i class="fas fa-star-half-alt"></i>
+                            <% } %>
+                            <% for(let i = 0; i < emptyStars; i++) { %>
+                                <i class="far fa-star"></i>
+                            <% } %>
+                            <div>
+                                <form action="/products/<%= product._id %>/rate" method="POST">
+                                    <label for="rating">Calificar:</label>
+                                    <div class="rating">
+                                        <% for(let i = 5; i >= 1; i--) { %>
+                                            <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>" required><label for="star<%= i %>"><i class="fas fa-star"></i></label>
+                                        <% } %>
+                                    </div>
+                                    <br>
+                                    <button type="submit" class="btn btn-primary">Calificar</button>
+                                </form>
+                                <br>
+                            </div>
+                            <% if (user && product.userId) { %>
+                                <!-- Agrega logs de depuración -->
+                                <% console.log('User ID:', user._id.toString()) %>
+                                <% console.log('Product Owner ID:', product.userId.toString()) %>
+                                <!-- Condición para los botones -->
+                                <% if (user._id.toString() === product.userId.toString()) { %>
+                                    <div>
+                                        <form action="/products/<%= product._id %>/edit" method="GET" style="display: inline;">
+                                            <button type="submit" class="btn btn-warning ms-2">Editar</button>
+                                        </form>
+                                        <form action="/products/<%= product._id %>/delete" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                    </div>
+                                <% } else { %>
+                                    <!-- Agrega un log si la condición no se cumple -->
+                                    <% console.log('La condición de ID no se cumple') %>
+                                <% } %>
+                            <% } %>                       
                         </div>
-                    <% } %>
-
-                    <form action="/comments" method="POST">
-                        <input type="hidden" name="productId" value="<%= product._id %>">
-                        <div class="form-floating">
-                            <textarea name="text" class="form-control" required></textarea>
-                            <label for="text">Agregar comentario</label>
-                        </div>
-                        <button type="submit" class="btn btn-primary mt-2">Agregar comentario</button>
-                    </form>
+                    </div>  
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex flex-column">
+                        <h3>Comentarios</h3>
+                        <% for(let comment of product.comments) { %>
+                            <div class="mb-3">
+                                <div class="form-floating">
+                                    <p class="form-control" id="commentText<%= comment._id %>"><%= comment.text %></p>
+                                    <label for="commentText<%= comment._id %>">Por: <%= comment.userId ? comment.userId.name : 'Usuario desconocido' %></label>
+                                </div>
+                                <% if (user && comment.userId && user._id.toString() === comment.userId._id.toString()) { %>
+                                    <div class="mt-2">
+                                        <form action="/comments/<%= comment._id %>/delete" method="POST" style="display: inline;">
+                                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                                        </form>
+                                        <form action="/comments/<%= comment._id %>/edit" method="GET" style="display: inline;">
+                                            <button type="submit" class="btn btn-warning ms-2">Editar</button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </div>
+                        <% } %>
+                        <form action="/comments" method="POST">
+                            <input type="hidden" name="productId" value="<%= product._id %>">
+                            <div class="form-floating">
+                                <textarea name="text" class="form-control" required></textarea>
+                                <label for="text">Agregar comentario</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary mt-2">Agregar comentario</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         <% } %>
     </div>
-    
  <!-- Option 1: Bootstrap Bundle with Popper -->
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 
-
+<script>
+    document.querySelectorAll('.rating input').forEach(radio => {
+    radio.addEventListener('change', function() {
+        this.parentNode.querySelectorAll('label').forEach(label => label.style.color = '#ccc');
+        this.checked && (this.nextElementSibling.style.color = '#f90');
+    });
+});
+</script>
 </body>
 </html>
