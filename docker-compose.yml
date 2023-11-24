@@ -11,8 +11,11 @@ services:
       - database
     volumes:
       - .:/usr/src/app
+
   database:
     container_name: powerpulsesports_db
     image: mongo
     ports:
       - "27019:27017"
+    volumes:
+        - ./temporal/docker:/data/db

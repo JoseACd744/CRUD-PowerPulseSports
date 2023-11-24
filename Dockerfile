@@ -1,17 +1,20 @@
 # Seleccionar la imagen base
-FROM node:18
+FROM node:14
 
-# Crear y Establecer el directorio de trabajo
-RUN mkdir -p /usr/src/app
+# Crear y establecer el directorio de trabajo
 WORKDIR /usr/src/app
+
 # Copiar los archivos de la aplicación web al contenedor
-COPY package.json ./
-COPY package-lock.json ./
+COPY package*.json ./
+
 # Instalar las dependencias de la aplicación
 RUN npm install
+
+# Copiar el resto de la aplicación
 COPY . .
+
 # Exponer el puerto en el que la aplicación web se ejecutará
 EXPOSE 3000
 
 # Iniciar la aplicación web
-CMD ["npm", "start"]
+CMD ["node", "src/index.js"]
