@@ -1,3 +1,5 @@
+// En tu código
+const bcrypt = require('bcryptjs');
 const ModelUser = require('../models/UserModel');
 
 exports.createUser = async (req, res) => {
@@ -14,9 +16,16 @@ exports.createUser = async (req, res) => {
         return res.status(400).send('Faltan campos necesarios');
     }
 
+    // Hashear la contraseña antes de almacenarla en la base de datos
+    const hashedPassword = await bcrypt.hash(body.password, 10); // 10 es el número de rondas de hashing
 
-    const respuesta = await ModelUser.create(body);
-    //res.send(respuesta);
+    // Almacenar el usuario en la base de datos con la contraseña hasheada
+    const respuesta = await ModelUser.create({
+        email: body.email,
+        name: body.name,
+        password: hashedPassword,
+    });
+
     res.redirect('/login');
 };
 
@@ -29,18 +38,24 @@ exports.loginUser = async (req, res) => {
         return res.status(400).send('No existe un usuario con este correo electrónico');
     }
 
-    // Comparar las contraseñas sin encriptar
-    if (user.password !== password) {
+    // Comparar la contraseña hasheada almacenada en la base de datos
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
         return res.status(400).send('Contraseña incorrecta');
     }
 
-    // Inicio de sesión exitoso, redirige a la página de productos
     // Inicio de sesión exitoso, guarda los datos del usuario en la sesión
     req.session.user = user;
     res.redirect('/products');
-   
 };
-
+exports.logoutUser = (req, res) => {
+    req.session.destroy((err) => {
+        if(err) {
+            return res.status(500).send('Hubo un error al cerrar la sesión');
+        }
+        res.redirect('/login');
+    });
+};
 
 exports.readUsers = async (req, res) => {
     try {

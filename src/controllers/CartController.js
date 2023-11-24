@@ -20,6 +20,7 @@ exports.readCartsForUser = async (req, res) => {
     }
 
     const respuesta = await CartModel.find({ userId: req.params.userId });
+    res.render('cart', { respuesta });
     res.send(respuesta);
 };
 
