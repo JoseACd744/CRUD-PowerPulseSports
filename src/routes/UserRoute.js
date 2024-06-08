@@ -20,5 +20,6 @@ router.get('/users/:id/edit', UserController.getUser); // Nueva ruta para mostra
 router.put('/users/:id', UserController.updateUser); // Ruta actualizada para manejar la solicitud PUT
 router.delete('/users/:id', UserController.deleteUser);
 
+router.get('/logout', UserController.logoutUser);
 
 module.exports = router;

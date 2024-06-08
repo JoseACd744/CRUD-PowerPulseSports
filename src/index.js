@@ -11,6 +11,12 @@ require('./database');
 app.set("view engine", "ejs")
 app.set("views", __dirname + "/views");
 
+
+app.get('/', (req, res) => {
+    res.redirect('/login');
+}
+);
+
 //uso formato json
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
